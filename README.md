@@ -138,4 +138,4 @@ The API returns proper error responses when something goes wrong:
   "error": "Element not found: #non-existent-element",
   "screenshot": "base64_png_data"
 }
-``` # be_assign
+```
