@@ -14,8 +14,41 @@ A REST API service that exposes Playwright browser automation actions as HTTP en
 
 ### Session Management
 
-- `POST /session/start`: Start a new browser session
-- `POST /session/close`: Close an active session
+#### `POST /session/start`
+
+Start a new browser session.
+
+**Request Parameters:**
+
+```json
+{
+  "browser": "chromium",      // Required: Browser type - "chromium", "firefox", or "webkit"
+  "headless": true,           // Optional: Run in headless mode (default: true)
+  "viewport_width": 1280,     // Optional: Viewport width in pixels
+  "viewport_height": 720,     // Optional: Viewport height in pixels
+  "device_scale_factor": 1.0  // Optional: Device scale factor
+}
+```
+
+**Response:**
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678"
+}
+```
+
+#### `POST /session/close`
+
+Close an active session.
+
+**Request:**
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678"
+}
+```
 
 ### Actions
 
@@ -71,12 +104,18 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 ## Usage Examples
 
-### Start a new session
+### Start a new session with configuration parameters
 
 ```bash
 curl -X POST http://localhost:8000/session/start \
   -H "Content-Type: application/json" \
-  -d '{"browser": "chromium", "headless": true}'
+  -d '{
+    "browser": "chromium", 
+    "headless": true,
+    "viewport_width": 1920,
+    "viewport_height": 1080,
+    "device_scale_factor": 1.5
+  }'
 ```
 
 Response:
@@ -126,6 +165,72 @@ curl -X POST http://localhost:8000/action/click \
 curl -X POST http://localhost:8000/session/close \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "12345678-1234-5678-1234-567812345678"}'
+```
+
+## Action Parameters
+
+### Goto
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "url": "https://example.com"
+}
+```
+
+### Click
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "locator": "text=Submit", // or {"role": "button", "name": "Submit"}
+  "force": false,           // Optional: Force click
+  "button": "left",         // Optional: "left", "right", or "middle"
+  "delay": 500             // Optional: Delay before click in milliseconds
+}
+```
+
+### Hover
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "locator": "text=Menu",   // or {"role": "button", "name": "Menu"}
+  "force": false,           // Optional: Force hover
+  "position": {"x": 10, "y": 20} // Optional: Hover position
+}
+```
+
+### Fill
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "locator": "input#email", // or {"role": "textbox", "name": "Email"}
+  "value": "user@example.com",
+  "force": false           // Optional: Force fill
+}
+```
+
+### Type
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "locator": "input#password", // or {"role": "textbox", "name": "Password"}
+  "text": "mysecretpassword",
+  "delay": 100               // Optional: Delay between key presses in milliseconds
+}
+```
+
+### Press
+
+```json
+{
+  "sessionId": "12345678-1234-5678-1234-567812345678",
+  "locator": "input#search", // or {"role": "searchbox", "name": "Search"}
+  "key": "Enter"
+}
 ```
 
 ## Error Handling
